@@ -4,17 +4,69 @@ const mathApp = {
     currentProblem: null,
     weakPoints: {}, // 追踪错误类型
 
-    // 2-3年级教材数据
+    // 2-3年级教材数据（深度版）
     data: {
         grade2: [
-            { id: 'g2_kakezan', title: 'かけ算の九九', concept: '同じ数を何度もたす代わりに「×」を使います。', template: '1さらに ${a}こずつ ${b}さらあります。全部で何こですか？', type: 'mul', range: [2, 9] },
-            { id: 'g2_length', title: '長さ（cmとmm）', concept: '1cmは10mmです。100cmは1mです。', template: '${a}cm ${b}mm は 何mmですか？', type: 'unit_len', a_range: [2, 20], b_range: [1, 9] },
+            {
+                id: 'g2_kakezan',
+                title: 'かけ算の九九',
+                concept: '同じ数を何度もたす代わりに「×」を使います。',
+                fullConcept: '「1つ分」が「いくつ」あるかを考える計算です。例えば、2個入りの袋が3つあるとき、2+2+2と計算するよりも、2×3と書いたほうが簡単です。',
+                steps: [
+                    'まず「1つ分の数」を見つけます。',
+                    '次に「いくつ分」あるかを数えます。',
+                    'それを「×」でつなぎます。'
+                ],
+                examples: [
+                    { q: 'リンゴが 3こずつ、4さら あります。', f: '3 × 4 = 12', a: '12こ' },
+                    { q: '5円の切手が 6まい あります。', f: '5 × 6 = 30', a: '30円' }
+                ],
+                template: '1さらに ${a}こずつ ${b}さらあります。全部で何こですか？',
+                type: 'mul',
+                range: [2, 9]
+            },
+            {
+                id: 'g2_length',
+                title: '長さ（cmとmm）',
+                concept: '1cmは10mmです。100cmは1mです。',
+                fullConcept: '長さの単位にはいくつかあります。一番小さいのが「mm（ミリメートル）」、その次が「cm（センチメートル）」です。1cmは10mmと同じ長さです。',
+                steps: [
+                    'ものさしの「0」をはじっこにあわせます。',
+                    'cmの大きなめもりを読みます。',
+                    'のこった小さなめもり（mm）を読みます。'
+                ],
+                examples: [
+                    { q: '3cm は 何mmですか？', f: '3 × 10 = 30', a: '30mm' },
+                    { q: '25mm は 何cm何mmですか？', f: '20mm + 5mm', a: '2cm 5mm' }
+                ],
+                template: '${a}cm ${b}mm は 何mmですか？',
+                type: 'unit_len',
+                a_range: [2, 20],
+                b_range: [1, 9]
+            },
             { id: 'g2_addition_carry', title: 'たし算の筆算', concept: '位（くらい）をそろえて計算します。', template: '${a} + ${b} は いくらですか？', type: 'add_carry', a_range: [10, 80], b_range: [10, 80] },
             { id: 'g2_subtraction_borrow', title: 'ひき算の筆算', concept: '上の位からかりてきて計算します。', template: '${a} - ${b} は 残りいくらですか？', type: 'sub_borrow', a_range: [40, 99], b_range: [10, 39] },
             { id: 'g2_v_problem', title: '文章題（のこりは？）', concept: '「のこりは」と聞かれたら、ひき算を使います。', template: 'アメを ${a}こ持っていました。${b}こ食べました。のこりは何こですか？', type: 'sub_v' }
         ],
         grade3: [
-            { id: 'g3_warizan', title: 'わり算（九九のぎゃく）', concept: 'わられる数の中に、わる数がいくつあるか考えます。', template: '${a}このアメを ${b}人に同じ数ずつ分けると、1人何こですか？', type: 'div', range: [2, 9] },
+            {
+                id: 'g3_warizan',
+                title: 'わり算（九九のぎゃく）',
+                concept: 'わられる数の中に、わる数がいくつあるか考えます。',
+                fullConcept: '全部の数を、同じ数ずつに「分ける」ときの計算です。九九の答えから、もとの数をさがすのがコツです。',
+                steps: [
+                    '全部でいくつあるかたしかめます。',
+                    '何人で分ける（または何個ずつ分ける）か考えます。',
+                    '九九を使って、答えを見つけます。'
+                ],
+                examples: [
+                    { q: '12このお菓子を3人で分けると？', f: '12 ÷ 3 = 4', a: '1人 4こ' },
+                    { q: '20ページを1日5ページずつ読むと？', f: '20 ÷ 5 = 4', a: '4日かかる' }
+                ],
+                template: '${a}このアメを ${b}人に同じ数ずつ分けると、1人何こですか？',
+                type: 'div',
+                range: [2, 9]
+            },
             { id: 'g3_warizan_amari', title: 'わり算（あまりあり）', concept: 'わりきれないときは「あまり」を書きます。', template: '${a} ÷ ${b} の 商（しょう）と あまりを求めてください。', type: 'div_rem', range: [2, 9] },
             { id: 'g3_fraction_basic', title: '分数の基礎', concept: '1つをいくつかに分けたうちの1つ分です。', template: '1つを ${a}等分したうちの 1つ分を分数で書くと？ (解答は 1/${a} の形式)', type: 'frac_text', range: [2, 8] },
             { id: 'g3_time_calc', title: '時刻と時間（後の時刻）', concept: '時計の針がどれくらい進むか考えます。', template: '${a}時${b}分から ${c}分後の時刻は何時何分ですか？', type: 'time_after', a_range: [1, 10], b_range: [10, 40], c_range: [10, 40] },
@@ -23,7 +75,6 @@ const mathApp = {
     },
 
     init() {
-        this.loadStats();
         this.bindEvents();
         this.renderUnits();
         this.updateStatsUI();
@@ -86,18 +137,48 @@ const mathApp = {
     showLesson(unit) {
         const modal = document.getElementById('lesson-detail');
         const content = document.getElementById('lesson-content');
+
+        // 构建深度学习内容
+        let stepsHtml = unit.steps ? unit.steps.map((s, i) => `<div class="step-item"><span>${i + 1}</span> ${s}</div>`).join('') : '';
+        let examplesHtml = unit.examples ? unit.examples.map(ex => `
+            <div class="example-card glass-container" style="background:white; margin-bottom:1rem; text-align:left;">
+                <p><strong>問：</strong>${ex.q}</p>
+                <p style="color:var(--primary); margin:10px 0;"><strong>式：</strong>${ex.f}</p>
+                <p><strong>答え：</strong>${ex.a}</p>
+            </div>
+        `).join('') : '';
+
         content.innerHTML = `
-            <div style="text-align:center;">
-                <h2 style="color:var(--primary);">${unit.title}</h2>
-                <div class="glass-container" style="margin:2rem 0; font-size:1.4rem; line-height:1.8; text-align:left; background:rgba(255,255,255,0.9);">
-                    <strong>【考え方】</strong><br>
-                    ${unit.concept}
+            <div class="deep-lesson">
+                <h1 style="color:var(--primary); margin-bottom:1.5rem;">${unit.title}</h1>
+                
+                <div class="lesson-section">
+                    <h3>📖 【解説】こつ</h3>
+                    <div class="glass-container" style="background:#fff9c4; font-size:1.2rem; line-height:1.7; text-align:left;">
+                        ${unit.fullConcept || unit.concept}
+                    </div>
                 </div>
-                <button class="btn-primary" onclick="mathApp.startPracticeFromUnit('${unit.id}')">この練習（れんしゅう）へ</button>
+
+                ${stepsHtml ? `
+                <div class="lesson-section" style="margin-top:2rem;">
+                    <h3>💡 【ステップ】ときかた</h3>
+                    <div class="steps-container">${stepsHtml}</div>
+                </div>` : ''}
+
+                ${examplesHtml ? `
+                <div class="lesson-section" style="margin-top:2rem;">
+                    <h3>📝 【例題】いっしょにやってみよう</h3>
+                    <div>${examplesHtml}</div>
+                </div>` : ''}
+
+                <div style="margin-top:3rem;">
+                    <button class="btn-primary" style="padding:1rem 4rem; font-size:1.6rem;" onclick="mathApp.startPracticeFromUnit('${unit.id}')">練習（れんしゅう）を始める</button>
+                </div>
             </div>
         `;
+
         modal.classList.remove('hide');
-        this.speak(unit.title + "。考え方。" + unit.concept);
+        this.speak(unit.title + "。解説。" + (unit.fullConcept || unit.concept));
     },
 
     hideLesson() {
@@ -335,13 +416,22 @@ const mathApp = {
         document.getElementById('xp-val').innerText = this.xp;
     },
 
+    // 辅助函数：通过 ID 获取单元标题
+    getUnitTitleById(id) {
+        const allUnits = [...this.data.grade2, ...this.data.grade3];
+        const unit = allUnits.find(u => u.id === id);
+        return unit ? unit.title : id;
+    },
+
     renderRecords() {
         const list = document.getElementById('weak-list');
+        if (!list) return;
         list.innerHTML = '';
         for (const id in this.weakPoints) {
             const li = document.createElement('li');
             li.style.margin = "10px 0";
-            li.innerText = `${id}: 失敗 ${this.weakPoints[id]}回`;
+            li.style.fontSize = "1.2rem";
+            li.innerHTML = `<strong>${this.getUnitTitleById(id)}</strong>: 失敗 ${this.weakPoints[id]}回`;
             list.appendChild(li);
         }
     }
