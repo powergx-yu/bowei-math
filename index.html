@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>BOWERI-LEARN | 算数マスター</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+</head>
+
+<body>
+    <div id="app">
+        <!-- サイドナビ（iPad用） -->
+        <aside class="sidebar">
+            <div class="logo">BOWERI</div>
+            <div class="grade-selector">
+                <button id="btn-grade2" class="grade-btn active" onclick="mathApp.setGrade(2)">2年生</button>
+                <button id="btn-grade3" class="grade-btn" onclick="mathApp.setGrade(3)">3年生</button>
+            </div>
+            <nav class="side-nav">
+                <div class="nav-item active" data-view="learn">📖 まなぶ</div>
+                <div class="nav-item" data-view="practice">✏️ れんしゅう</div>
+                <div class="nav-item" data-view="challenge">🏆 ちょうぜん</div>
+                <div class="nav-item" data-view="record">📊 きろく</div>
+            </nav>
+            <div class="stats-panel">
+                <div class="xp-display">XP: <span id="xp-val">0</span></div>
+            </div>
+        </aside>
+
+        <!-- メインコンテンツ -->
+        <main class="main-content">
+            <!-- 1. 学習ビュー -->
+            <section id="view-learn" class="view active">
+                <h2 class="view-title">知識点のへや</h2>
+                <div id="unit-list" class="grid-container">
+                    <!-- JSで動的に生成 -->
+                </div>
+                <div id="lesson-detail" class="glass-container modal hide">
+                    <button class="close-btn" onclick="mathApp.hideLesson()">×</button>
+                    <div id="lesson-content"></div>
+                </div>
+            </section>
+
+            <!-- 2. 練習・挑戦ビュー (共用) -->
+            <section id="view-practice" class="view">
+                <h2 class="view-title" id="practice-head">れんしゅうトレーニング</h2>
+                <div id="challenge-timer" class="glass-container hide" style="margin-bottom:1rem; text-align:center;">
+                    じかん: <span id="time-val" style="font-size:1.5rem; color:var(--primary);">0</span> 秒
+                </div>
+                <div class="problem-area glass-container">
+                    <div class="problem-text" id="p-text"></div>
+                    <div id="p-visual" style="width:100%; display:flex; justify-content:center;"></div>
+                    <div class="input-area">
+                        <input type="text" id="p-input" class="math-input" placeholder="？">
+                        <button class="btn-primary" onclick="mathApp.checkAnswer()">こたえる</button>
+                    </div>
+                    <div class="feedback" id="feedback"></div>
+                </div>
+                <!-- 詳しい解説用 -->
+                <div id="p-explain" class="glass-container hide" style="margin-top:20px; background: #e8f5e9;">
+                    <h4>💡 解き方のコツ</h4>
+                    <p id="explain-text" style="font-size:1.2rem; margin:1rem 0;"></p>
+                    <button class="btn-primary" style="padding:0.5rem 1.5rem; font-size:1rem;"
+                        onclick="mathApp.speakExplain()">🔊 読み上げ</button>
+                </div>
+            </section>
+
+            <!-- 3. 挑戦ビュー (入り口のみ) -->
+            <section id="view-challenge" class="view">
+                <h2 class="view-title">総合テスト</h2>
+                <div class="challenge-start glass-container" id="challenge-init">
+                    <p style="font-size:1.5rem; margin-bottom:2rem;">これまでの学習を試してみよう！<br>10問にチャレンジして、ボーナスXPをゲットしよう。</p>
+                    <button class="btn-primary" onclick="mathApp.startChallenge()">スタート！</button>
+                </div>
+            </section>
+
+            <!-- 4. 記録ビュー -->
+            <section id="view-record" class="view">
+                <h2 class="view-title">学習のきろく</h2>
+                <div class="glass-container">
+                    <h3>苦手なところ（もっと練習しよう！）</h3>
+                    <ul id="weak-list"></ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="main.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js');
+        }
+    </script>
+</body>
+
+</html>
