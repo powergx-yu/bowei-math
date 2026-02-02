@@ -3,6 +3,7 @@ const mathApp = {
     xp: 0,
     currentProblem: null,
     weakPoints: {}, // 追踪错误类型
+    autoSpeak: true, // 默认开启自动发音
 
     // 2-3年级教材数据（深度版）
     data: {
@@ -200,13 +201,28 @@ const mathApp = {
     },
 
     loadStats() {
-        const saved = JSON.parse(localStorage.getItem('boweri_math_stats') || '{"xp":0,"weak":{}}');
+        const saved = JSON.parse(localStorage.getItem('boweri_math_stats') || '{"xp":0,"weak":{},"autoSpeak":true}');
         this.xp = saved.xp;
         this.weakPoints = saved.weak;
+        this.autoSpeak = saved.autoSpeak !== undefined ? saved.autoSpeak : true;
+
+        // 更新 UI 开关状态
+        const toggle = document.getElementById('voice-auto-toggle');
+        if (toggle) toggle.checked = this.autoSpeak;
     },
 
     saveStats() {
-        localStorage.setItem('boweri_math_stats', JSON.stringify({ xp: this.xp, weak: this.weakPoints }));
+        localStorage.setItem('boweri_math_stats', JSON.stringify({
+            xp: this.xp,
+            weak: this.weakPoints,
+            autoSpeak: this.autoSpeak
+        }));
+    },
+
+    toggleAutoSpeak() {
+        this.autoSpeak = document.getElementById('voice-auto-toggle').checked;
+        this.saveStats();
+        if (!this.autoSpeak) window.speechSynthesis.cancel();
     },
 
     bindEvents() {
@@ -296,7 +312,7 @@ const mathApp = {
         `;
 
         modal.classList.remove('hide');
-        this.speak(unit.title + "。解説。" + (unit.fullConcept || unit.concept));
+        this.speak(unit.title + "。解説。" + (unit.fullConcept || unit.concept), true);
     },
 
     hideLesson() {
@@ -404,7 +420,7 @@ const mathApp = {
         document.getElementById('feedback').innerText = '';
         document.getElementById('p-explain').classList.add('hide');
 
-        this.speak(text);
+        this.speak(text, true);
     },
 
     createTapeDiagram(part, count) {
@@ -430,7 +446,7 @@ const mathApp = {
             this.xp += 10;
             this.saveStats();
             this.updateStatsUI();
-            this.speak("正解です！");
+            this.speak("正解です！", true);
 
             if (this.challengeState.active) {
                 this.challengeState.count++;
@@ -445,7 +461,7 @@ const mathApp = {
             this.showExplain();
             this.weakPoints[p.unit.id] = (this.weakPoints[p.unit.id] || 0) + 1;
             this.saveStats();
-            this.speak("残念、もう一度考えてみよう。");
+            this.speak("残念、もう一度考えてみよう。", true);
         }
     },
 
@@ -518,8 +534,10 @@ const mathApp = {
         this.switchView('challenge');
     },
 
-    speak(text) {
-        window.speechSynthesis.cancel(); // 播报新内容前，立刻停止之前的所有播报
+    speak(text, isAuto = false) {
+        window.speechSynthesis.cancel();
+        if (isAuto && !this.autoSpeak) return; // 如果是自动播报且关闭了开关，则不执行播报
+
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = 'ja-JP';
         uttr.rate = 0.9;

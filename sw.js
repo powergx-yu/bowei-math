@@ -1,4 +1,4 @@
-const CACHE_NAME = 'boweri-learn-v1';
+const CACHE_NAME = 'bowei-math-v1';
 const ASSETS = [
     'index.html',
     'style.css',

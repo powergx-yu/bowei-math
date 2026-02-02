@@ -1,6 +1,6 @@
 {
-  "name": "BOEWI-MATH 算数マスター",
-  "short_name": "BOEWI",
+  "name": "BOWEI-MATH 算数マスター",
+  "short_name": "BOWEI",
   "description": "日本小学校2-3年生向けの算数適応型学習システム",
   "start_url": "index.html",
   "display": "standalone",
