@@ -5,6 +5,8 @@ const mathApp = {
     weakPoints: {}, // 追踪错误类型
     autoSpeak: true, // 默认开启自动发音
     currentLessonUnit: null, // 当前显示的教学单元
+    practiceMode: 'random', // 'random' 或 'locked'
+    lockedUnitId: null, // 专项练习时的单元ID
 
     // 2-3年级教材数据（深度版）
     data: {
@@ -276,6 +278,14 @@ const mathApp = {
         if (targetView) targetView.classList.add('active');
         this.currentView = viewId;
 
+        // 如果是从导航进入练习，重置为随机模式
+        if (viewId === 'practice' && this.practiceMode !== 'locked') {
+            this.practiceMode = 'random';
+            this.lockedUnitId = null;
+            document.getElementById('practice-head').innerText = '✏️ 総合れんしゅう';
+            document.getElementById('p-sub-head')?.classList.add('hide');
+        }
+
         if (viewId === 'practice') this.generateProblem();
         if (viewId === 'record') this.renderRecords();
     },
@@ -387,21 +397,64 @@ const mathApp = {
     },
 
     startPracticeFromUnit(id) {
+        this.practiceMode = 'locked';
+        this.lockedUnitId = id;
         this.hideLesson();
         this.switchView('practice');
-        // 这里可以改进为只练习选中的单元
+
+        const unitTitle = this.getUnitTitleById(id);
+        document.getElementById('practice-head').innerText = '✏️ 专项れんしゅう';
+
+        // 显示一个子标题告诉用户正在练习什么
+        let subHead = document.getElementById('p-sub-head');
+        if (!subHead) {
+            subHead = document.createElement('div');
+            subHead.id = 'p-sub-head';
+            subHead.style.textAlign = 'center';
+            subHead.style.marginBottom = '1rem';
+            subHead.style.color = 'var(--primary)';
+            subHead.style.fontWeight = 'bold';
+            document.getElementById('practice-head').after(subHead);
+        }
+        subHead.innerHTML = `
+            <div class="locked-badge">📖「${unitTitle}」の集中トレーニング ✅</div>
+            <button class="btn-secondary" onclick="mathApp.resetPracticeMode()">全範囲のれんしゅうに戻る</button>
+        `;
+        subHead.classList.remove('hide');
+    },
+
+    resetPracticeMode() {
+        this.practiceMode = 'random';
+        this.lockedUnitId = null;
+        document.getElementById('practice-head').innerText = '✏️ 総合れんしゅう';
+        document.getElementById('p-sub-head')?.classList.add('hide');
+        this.generateProblem();
     },
 
     // 乱数题目生成引擎
     generateProblem() {
-        const units = this.data[`grade${this.grade}`];
-        // 自适应权重选择：如果某个单元在 weakPoints 中分值高，则更高概率选到
-        let pool = [];
-        units.forEach(u => {
-            const weight = (this.weakPoints[u.id] || 0) + 1;
-            for (let i = 0; i < weight; i++) pool.push(u);
-        });
-        const unit = pool[Math.floor(Math.random() * pool.length)];
+        const units = this.data[`grade${this.grade}`] || [];
+        if (units.length === 0) return;
+
+        let unit;
+        if (this.practiceMode === 'locked' && this.lockedUnitId) {
+            unit = units.find(u => u.id === this.lockedUnitId);
+            if (!unit) {
+                // 如果找不到锁定的单元（可能由于年级切换），回退到随机模式
+                this.practiceMode = 'random';
+                this.lockedUnitId = null;
+            }
+        }
+
+        if (!unit) {
+            // 自适应权重选择：如果某个单元在 weakPoints 中分值高，则更高概率选到
+            let pool = [];
+            units.forEach(u => {
+                const weight = (this.weakPoints[u.id] || 0) + 1;
+                for (let i = 0; i < weight; i++) pool.push(u);
+            });
+            unit = pool[Math.floor(Math.random() * pool.length)];
+        }
 
         let a, b, c, ans, text, visual = '';
 
