@@ -60,7 +60,10 @@
                     じかん: <span id="time-val" style="font-size:1.5rem; color:var(--primary);">0</span> 秒
                 </div>
                 <div class="problem-area glass-container">
-                    <div class="problem-text" id="p-text"></div>
+                    <div class="problem-voice-row">
+                        <button class="btn-voice-icon" onclick="mathApp.speakProblem()" title="問題を読み上げる">📢</button>
+                        <div class="problem-text" id="p-text"></div>
+                    </div>
                     <div id="p-visual" style="width:100%; display:flex; justify-content:center;"></div>
                     <div class="input-area">
                         <input type="text" id="p-input" class="math-input" placeholder="？">

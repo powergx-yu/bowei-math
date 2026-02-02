@@ -4,6 +4,7 @@ const mathApp = {
     currentProblem: null,
     weakPoints: {}, // 追踪错误类型
     autoSpeak: true, // 默认开启自动发音
+    currentLessonUnit: null, // 当前显示的教学单元
 
     // 2-3年级教材数据（深度版）
     data: {
@@ -269,6 +270,7 @@ const mathApp = {
     },
 
     showLesson(unit) {
+        this.currentLessonUnit = unit;
         const modal = document.getElementById('lesson-detail');
         const content = document.getElementById('lesson-content');
 
@@ -282,8 +284,23 @@ const mathApp = {
             </div>
         `).join('') : '';
 
+        // 在详情页顶部增加语音控制条
+        const voiceControls = `
+            <div class="lesson-voice-controls glass-container">
+                <button class="btn-voice-manual" onclick="mathApp.speakCurrentLesson()">📢 今の説明を読み上げる</button>
+                <div class="voice-toggle-mini">
+                    <span>オート読み上げ</span>
+                    <label class="switch is-mini">
+                        <input type="checkbox" class="voice-auto-cb" ${this.autoSpeak ? 'checked' : ''} onchange="mathApp.syncAutoSpeak(this.checked)">
+                        <span class="slider round"></span>
+                    </label>
+                </div>
+            </div>
+        `;
+
         content.innerHTML = `
             <div class="deep-lesson">
+                ${voiceControls}
                 <h1 style="color:var(--primary); margin-bottom:1.5rem;">${unit.title}</h1>
                 
                 <div class="lesson-section">
@@ -318,6 +335,22 @@ const mathApp = {
     hideLesson() {
         window.speechSynthesis.cancel(); // 关闭弹窗时停止发音
         document.getElementById('lesson-detail').classList.add('hide');
+        this.currentLessonUnit = null;
+    },
+
+    syncAutoSpeak(val) {
+        this.autoSpeak = val;
+        // 同步侧边栏的开关
+        const sidebarToggle = document.getElementById('voice-auto-toggle');
+        if (sidebarToggle) sidebarToggle.checked = val;
+        this.saveStats();
+        if (!val) window.speechSynthesis.cancel();
+    },
+
+    speakCurrentLesson() {
+        if (this.currentLessonUnit) {
+            this.speak(this.currentLessonUnit.title + "。解説。" + (this.currentLessonUnit.fullConcept || this.currentLessonUnit.concept));
+        }
     },
 
     startPracticeFromUnit(id) {
@@ -465,6 +498,12 @@ const mathApp = {
         }
     },
 
+    speakProblem() {
+        if (this.currentProblem) {
+            this.speak(this.currentProblem.text);
+        }
+    },
+
     showExplain() {
         const exp = document.getElementById('p-explain');
         const txt = document.getElementById('explain-text');
@@ -569,6 +608,21 @@ const mathApp = {
             li.style.fontSize = "1.2rem";
             li.innerHTML = `<strong>${this.getUnitTitleById(id)}</strong>: 失敗 ${this.weakPoints[id]}回`;
             list.appendChild(li);
+        }
+    },
+
+    syncAutoSpeak(val) {
+        this.autoSpeak = val;
+        // 同步侧边栏的开关
+        const sidebarToggle = document.getElementById('voice-auto-toggle');
+        if (sidebarToggle) sidebarToggle.checked = val;
+        this.saveStats();
+        if (!val) window.speechSynthesis.cancel();
+    },
+
+    speakCurrentLesson() {
+        if (this.currentLessonUnit) {
+            this.speak(this.currentLessonUnit.title + "。解説。" + (this.currentLessonUnit.fullConcept || this.currentLessonUnit.concept));
         }
     }
 };

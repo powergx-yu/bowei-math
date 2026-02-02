@@ -116,6 +116,81 @@ input:checked+.slider:before {
     border-radius: 50%;
 }
 
+/* 语音相关增强样式 */
+.problem-voice-row {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    justify-content: center;
+}
+
+.btn-voice-icon {
+    background: white;
+    border: 2px solid var(--primary);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+    flex-shrink: 0;
+}
+
+.btn-voice-icon:active {
+    transform: scale(0.9);
+}
+
+.lesson-voice-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding: 1rem 1.5rem !important;
+    background: rgba(255, 255, 255, 0.8) !important;
+    border-radius: 15px;
+    border: 1px solid var(--border);
+}
+
+.btn-voice-manual {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 30px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(74, 124, 89, 0.2);
+}
+
+.voice-toggle-mini {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1rem;
+    color: var(--text-main);
+}
+
+.switch.is-mini {
+    width: 40px;
+    height: 22px;
+}
+
+.switch.is-mini .slider:before {
+    height: 16px;
+    width: 16px;
+    left: 3px;
+    bottom: 3px;
+}
+
+.switch.is-mini input:checked+.slider:before {
+    transform: translateX(18px);
+}
+
 .logo {
     font-size: 1.8rem;
     font-weight: 800;
