@@ -320,6 +320,7 @@ const mathApp = {
     },
 
     speak(text) {
+        window.speechSynthesis.cancel(); // 播报新内容前，立刻停止之前的所有播报
         const uttr = new SpeechSynthesisUtterance(text);
         uttr.lang = 'ja-JP';
         uttr.rate = 0.9;
