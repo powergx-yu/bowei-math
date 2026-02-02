@@ -99,6 +99,22 @@ const mathApp = {
                 ],
                 template: 'アメを ${a}こ持っていました。${b}こ食べました。のこりは何こですか？',
                 type: 'sub_v'
+            },
+            {
+                id: 'g2_mixed_plus_minus',
+                title: 'たし算とひき算のまざった計算',
+                concept: '左からじゅんばんに計算します。',
+                fullConcept: 'たし算とひき算がまざっているときは、左から順番に計算するのがルールです。',
+                steps: [
+                    '式の左側を最初に見ます。',
+                    '左の2つの数を計算します。',
+                    'その答えに、残りの数をたしたりひいたりします。'
+                ],
+                examples: [
+                    { q: '15 - 7 + 4 は？', f: '15 - 7 = 8, 8 + 4 = 12', a: '12' }
+                ],
+                template: '${a} - ${b} + ${c} は？',
+                type: 'mixed_g2'
             }
         ],
         grade3: [
@@ -459,8 +475,8 @@ const mathApp = {
                 text = unit.template.replace('${a}', a);
                 break;
             case 'mixed_basic':
-                let type = Math.random() > 0.5 ? 'priority' : 'brackets';
-                if (type === 'priority') {
+                let mType = Math.random() > 0.5 ? 'priority' : 'brackets';
+                if (mType === 'priority') {
                     a = Math.floor(Math.random() * 20) + 10;
                     b = Math.floor(Math.random() * 5) + 2;
                     c = Math.floor(Math.random() * 5) + 2;
@@ -473,6 +489,13 @@ const mathApp = {
                     ans = (a - b) * c;
                     text = `(${a} - ${b}) × ${c}`;
                 }
+                break;
+            case 'mixed_g2':
+                a = Math.floor(Math.random() * 10) + 15;
+                b = Math.floor(Math.random() * 7) + 3;
+                c = Math.floor(Math.random() * 10) + 5;
+                ans = a - b + c;
+                text = `${a} - ${b} + ${c}`;
                 break;
             default:
                 a = 10; b = 5; ans = 15; text = "10 + 5 は？";
@@ -574,6 +597,9 @@ const mathApp = {
                 } else {
                     explain = `計算のじゅんじょが大事です。たし算よりも「×」を先に計算します。先に ${p.b} × ${p.c} をやってから、${p.a} をたします。`;
                 }
+                break;
+            case 'mixed_g2':
+                explain = `左から順番に計算します。まず ${p.a} - ${p.b} = ${p.a - p.b} を計算して、その答えに ${p.c} をたします。`;
                 break;
             default:
                 explain = `正解は ${p.ans} です。よく見直してみよう！`;
