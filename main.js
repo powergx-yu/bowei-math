@@ -190,6 +190,23 @@ const mathApp = {
                 template: '0.1 が ${a}こ集まると いくらになりますか？',
                 type: 'decimal_intro',
                 a_range: [2, 15]
+            },
+            {
+                id: 'g3_mixed_op',
+                title: '計算の順序（＋－×÷）',
+                concept: '×や÷を先に計算します。（ ）の中も先です。',
+                fullConcept: '計算には順番のルールがあります。①（ ）の中、② × と ÷、③ ＋ と － の順番で計算します。このルールを守らないと、答えが変わってしまいます。',
+                steps: [
+                    '式の中に（ ）があるか探して、あれば最初に計算します。',
+                    '次に「×」や「÷」を計算します。',
+                    '最後に「＋」や「－」を左から順番に計算します。'
+                ],
+                examples: [
+                    { q: '5 + 3 × 4 は？', f: '3 × 4 = 12 を先にやる。 5 + 12 = 17', a: '17' },
+                    { q: '(10 - 2) × 3 は？', f: '( )の中の 10 - 2 = 8 を先にやる。 8 × 3 = 24', a: '24' }
+                ],
+                template: '次の計算をしてください：${a} + ${b} × ${c}',
+                type: 'mixed_basic'
             }
         ]
     },
@@ -441,6 +458,22 @@ const mathApp = {
                 ans = (a * 0.1).toFixed(1);
                 text = unit.template.replace('${a}', a);
                 break;
+            case 'mixed_basic':
+                let type = Math.random() > 0.5 ? 'priority' : 'brackets';
+                if (type === 'priority') {
+                    a = Math.floor(Math.random() * 20) + 10;
+                    b = Math.floor(Math.random() * 5) + 2;
+                    c = Math.floor(Math.random() * 5) + 2;
+                    ans = a + b * c;
+                    text = `${a} + ${b} × ${c}`;
+                } else {
+                    a = Math.floor(Math.random() * 10) + 10;
+                    b = Math.floor(Math.random() * 5) + 2;
+                    c = Math.floor(Math.random() * 5) + 2;
+                    ans = (a - b) * c;
+                    text = `(${a} - ${b}) × ${c}`;
+                }
+                break;
             default:
                 a = 10; b = 5; ans = 15; text = "10 + 5 は？";
         }
@@ -534,6 +567,13 @@ const mathApp = {
                 break;
             case 'time_after':
                 explain = `${p.b}分に${p.c}分をたすと${p.b + p.c}分。60分で1時間増えるから、時刻は ${p.ans.slice(0, -2)}時${p.ans.slice(-2)}分になるよ。`;
+                break;
+            case 'mixed_basic':
+                if (p.text.includes('(')) {
+                    explain = `（ ）の中を一番最初に計算します。先に (${p.a} - ${p.b}) を計算して、そのあとに × ${p.c} をします。`;
+                } else {
+                    explain = `計算のじゅんじょが大事です。たし算よりも「×」を先に計算します。先に ${p.b} × ${p.c} をやってから、${p.a} をたします。`;
+                }
                 break;
             default:
                 explain = `正解は ${p.ans} です。よく見直してみよう！`;
