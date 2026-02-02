@@ -51,6 +51,7 @@ const mathApp = {
     },
 
     switchView(viewId) {
+        window.speechSynthesis.cancel(); // 切换页面时停止发音
         document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
         const targetView = document.getElementById(`view-${viewId}`);
         if (targetView) targetView.classList.add('active');
@@ -100,6 +101,7 @@ const mathApp = {
     },
 
     hideLesson() {
+        window.speechSynthesis.cancel(); // 关闭弹窗时停止发音
         document.getElementById('lesson-detail').classList.add('hide');
     },
 
